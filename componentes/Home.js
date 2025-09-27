@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Alert, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, IconButton } from 'react-native-paper';
-import { fetchEstoque, deleteEstoque } from './Api';
+import { fetchProdutos, deleteProdutos } from './Api';
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function Home({ navigation }) {
     const [registro, setRegistros] = useState([]);
 
     useEffect(() => {
-        fetchEstoque(setRegistros);
+        fetchProdutos(setRegistros);
     }, []);
 
     const handleDelete = (id) => {
@@ -18,7 +19,7 @@ export default function Home({ navigation }) {
                 { text: 'Cancelar', style: 'cancel' },
                 {
                     text: 'Deletar',
-                    onPress: () => deleteEstoque(id, setRegistros),
+                    onPress: () => deleteProdutos(id, setRegistros),
                 },
             ]
         );
@@ -26,6 +27,7 @@ export default function Home({ navigation }) {
 
     return (
         <View style={styles.container}>
+            <Text style={styles.titulo}>Lista de Produtos </Text>
             <FlatList
                 data={registro}
                 keyExtractor={(item) => item.id.toString()}
@@ -43,6 +45,12 @@ export default function Home({ navigation }) {
                                     icon="pencil"
                                     size={24}
                                     iconColor="#3498db"
+                                    onPress={() => navigation.navigate('Alterar', { produtos: item })}
+                                />
+                                <IconButton
+                                    icon="delete"
+                                    size={24}
+                                    iconColor="#e74c3c"
                                     onPress={() => handleDelete(item.id)}
                                 />
                             </View>

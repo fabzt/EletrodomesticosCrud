@@ -30,9 +30,9 @@ export default function Alterar({ route, navigation }) {
 
   return (
     <View>
-      <TextInput placeholder="Produto" value={nome} onChandeText={setNome} />
-      <TextInput placeholder="Marca" value={marca} onChandeText={setMarca} />
-      <TextInput placeholder="Preco" value={preco} onChandeText={setPreco} />
+      <TextInput placeholder="Produto" value={nome} onChangeText={setNome} />
+      <TextInput placeholder="Marca" value={marca} onChangeText={setMarca} />
+      <TextInput placeholder="Preco" value={preco} onChangeText={setPreco} />
 
       <Button title="Alterar" onPress={handleUpdate} />
     </View>

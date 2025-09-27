@@ -1,31 +1,33 @@
 import { Alert } from 'react-native';
 
-const API_URL = 'https://apiestoque.webapptech.site/api/produtos'; 
+const API_URL = 'https://apiestoque.webapptech.site/api/produtos';
 
-export const fetchEstoque = async (setRegistros) => {
+// Buscar produtos
+export const fetchProdutos = async (setRegistros) => {
     try {
         const response = await fetch(API_URL);
         if (!response.ok) {
-            throw new Error('Erro ao buscar o Estoque');
+            throw new Error('Erro ao buscar o Produto');
         }
 
-        const data = await response.json();
-        console.log('Estoques recebidos da API:', data);
-        setRegistros(data.data); // Verifique se "data.data" está correto conforme a estrutura da resposta
+        const dados = await response.json();
+        console.log('Estoques recebidos da API:', dados);
+        setRegistros(dados.data);
     } catch (error) {
         console.error('Erro ao buscar o Estoque:', error);
         throw error;
     }
 };
 
-export const createEstoque = async (EstoqueData) => {
+// Criar produto
+export const createProdutos = async (ProdutosData) => {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(EstoqueData),
+            body: JSON.stringify(ProdutosData),
         });
 
         if (response.status === 204) {
@@ -50,15 +52,16 @@ export const createEstoque = async (EstoqueData) => {
 
         return responseData;
     } catch (error) {
-        console.error('Erro ao cadastrar o Estoque:', error.message);
+        console.error('Erro ao cadastrar o Produto:', error.message);
         Alert.alert('Erro ao cadastrar', `Detalhes: ${error.message}`);
         return null;
     }
 };
 
-export const deleteEstoque = async (EstoqueId, setRegistros) => {
+// Excluir produto
+export const deleteProdutos = async (produtoId, setRegistros) => {
     try {
-        const response = await fetch(`https://siteapi/${EstoqueId}`, {
+        const response = await fetch(`${API_URL}/${produtoId}`, {
             method: 'DELETE',
         });
 
@@ -66,63 +69,30 @@ export const deleteEstoque = async (EstoqueId, setRegistros) => {
             const responseData = await response.json();
 
             if (responseData.success) {
-                Alert.alert('Sucesso!', responseData.message);
+                Alert.alert('Sucesso!', responseData.message || 'Produto excluído com sucesso');
 
-                setRegistros((prevRegistros) => {
-                    const novaLista = prevRegistros.filter(
-                        (estoque) => estoque.id !== EstoqueId
+                if (typeof setRegistros === 'function') {
+                    setRegistros((prevRegistros) =>
+                        prevRegistros.filter((produto) => produto.id !== produtoId)
                     );
-                    return novaLista;
-                });
+                }
             } else {
-                Alert.alert('Erro', responseData.message);
+                Alert.alert('Erro', responseData.message || 'Não foi possível excluir o produto.');
             }
         } else {
-            const textResponse = await response.text();
-            let responseData = null;
-
+            let mensagemErro = 'Erro desconhecido ao excluir o produto';
             try {
-                responseData = JSON.parse(textResponse);
-            } catch (error) {
-                console.warn('A resposta não é um JSON válido.');
+                const texto = await response.text();
+                const erroJson = JSON.parse(texto);
+                mensagemErro = erroJson.message || mensagemErro;
+            } catch (e) {
+                console.warn('Resposta de erro não era JSON válido');
             }
 
-            throw new Error(responseData?.message || 'Erro desconhecido ao excluir o Estoque');
+            throw new Error(mensagemErro);
         }
     } catch (error) {
-        console.error('Erro ao excluir Estoque:', error.message);
+        console.error('Erro ao excluir o produto:', error);
         Alert.alert('Erro ao excluir', `Detalhes: ${error.message}`);
-    }
-};
-
-export const updateEstoque = async (EstoqueId, updatedData, navigation) => {
-    try {
-        const response = await fetch(`https://siteapi/${EstoqueId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedData),
-        });
-
-        console.log('Dados enviados:', updatedData);
-
-        if (response.status === 200) {
-            Alert.alert('Sucesso!', 'Estoque atualizado com sucesso!');
-            navigation.navigate('Home');
-        } else {
-            const textResponse = await response.text();
-            let responseData;
-            try {
-                responseData = JSON.parse(textResponse);
-            } catch (error) {
-                console.warn('A resposta não é um JSON válido.');
-                responseData = null;
-            }
-            throw new Error(responseData?.message || 'Erro desconhecido ao atualizar o Estoque');
-        }
-    } catch (error) {
-        console.error('Erro ao atualizar o Estoque:', error.message);
-        Alert.alert('Erro ao atualizar', `Detalhes: ${error.message}`);
     }
 };
