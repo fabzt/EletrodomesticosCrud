@@ -96,3 +96,34 @@ export const deleteProdutos = async (produtoId, setRegistros) => {
         Alert.alert('Erro ao excluir', `Detalhes: ${error.message}`);
     }
 };
+
+export const updateProdutos = async (produtoId, updatedData, navigation) => {
+    try {
+        const response = await fetch(`https://apiestoque.webapptech.site/api/produtos/${produtoId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedData),
+        });
+
+        if (response.status === 200) {
+            Alert.alert('Sucesso!', 'Produtos atualizado com sucesso');
+            navigation.navigate('Home');
+        } else {
+            const textResponse = await response.text();
+            let responseData;
+            try {
+                responseData = JSON.parse(textResponse);
+        } catch (error) {
+            console.warn('A resposta não é um JSON válido.');
+            responseData = null;
+            }
+
+            throw new Error(responseData?.message || 'Erro desconhecido ao atualizar o produto');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar os produtos:', error.message);
+        Alert.alert('Erro ao atualizar', 'Detalhes: ${error.message}');
+    }
+};

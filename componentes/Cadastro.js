@@ -9,7 +9,7 @@ export default function Cadastro({ navigation }) {
 
   const handleSubmit = async () => {
     if (!nome || !marca || !preco) {
-      Alert.alert('Atenção', 'Preencha tododos os campos antes de cadastrar.');
+      Alert.alert("Atenção', 'Preencha tododos os campos antes de cadastrar.");
       return;
     }
 
